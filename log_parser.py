@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import deque
 
 def parse_log_file(file_path, num_lines):
-    pattern = r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (\w+) (.+)'
+    pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)'
     parsed_logs = deque(maxlen=num_lines)
     
     try:
@@ -13,7 +13,9 @@ def parse_log_file(file_path, num_lines):
                 match = re.match(pattern, line)
                 if match:
                     timestamp_str, log_level, message = match.groups()
-                    timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
+                    # 타임존 정보를 제거하고 파싱 (Python 3.6 이하 버전 호환성을 위해)
+                    # "2024-08-05T23:27:41+0900" 형식의 내용에서 뒤 5자리 +0900 제거
+                    timestamp = datetime.strptime(timestamp_str[:-5], '%Y-%m-%dT%H:%M:%S')
                     parsed_logs.append({
                         'timestamp': timestamp,
                         'log_level': log_level,
