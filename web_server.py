@@ -6,14 +6,17 @@ import mimetypes
 import threading
 import time
 
+
+# 다시한번 변경 테스트
 def get_content_type(file_path):
     mime_type, _ = mimetypes.guess_type(file_path)
-    return mime_type or 'application/octet-stream'
+    return mime_type or "application/octet-stream"
+
 
 def handle_request(client_socket, base_dir):
     try:
-        request = client_socket.recv(1024).decode('utf-8')
-        request_lines = request.split('\n')
+        request = client_socket.recv(1024).decode("utf-8")
+        request_lines = request.split("\n")
         request_line = request_lines[0].strip().split()
 
         if len(request_line) >= 2:
@@ -29,13 +32,22 @@ def handle_request(client_socket, base_dir):
                     with open(file_path, "rb") as file:
                         content = file.read()
                     content_type = get_content_type(file_path)
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: {content_type}; charset=utf-8\r\n\r\n".encode() + content
+                    response = (
+                        f"HTTP/1.1 200 OK\r\nContent-Type: {content_type}; charset=utf-8\r\n\r\n".encode()
+                        + content
+                    )
                 except FileNotFoundError:
-                    response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>404 Not Found</h1>".encode('utf-8')
+                    response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>404 Not Found</h1>".encode(
+                        "utf-8"
+                    )
             else:
-                response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>405 Method Not Allowed</h1>".encode('utf-8')
+                response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>405 Method Not Allowed</h1>".encode(
+                    "utf-8"
+                )
         else:
-            response = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>400 Bad Request</h1>".encode('utf-8')
+            response = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<h1>400 Bad Request</h1>".encode(
+                "utf-8"
+            )
 
         client_socket.sendall(response)
     except Exception as e:
@@ -43,10 +55,11 @@ def handle_request(client_socket, base_dir):
     finally:
         client_socket.close()
 
+
 def run_server(base_dir, port=8080):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(('', port))
+    server_socket.bind(("", port))
     server_socket.listen(1)
     server_socket.settimeout(1)  # 1초 타임아웃 설정
     print(f"서버가 http://localhost:{port}/에서 실행 중입니다.")
@@ -60,7 +73,7 @@ def run_server(base_dir, port=8080):
         while server_running:
             try:
                 user_input = input().strip().lower()
-                if user_input in ['q', 'quit']:
+                if user_input in ["q", "quit"]:
                     print("\n사용자 입력으로 서버 종료 중...")
                     server_running = False
                     break
@@ -79,7 +92,9 @@ def run_server(base_dir, port=8080):
             try:
                 client_socket, client_address = server_socket.accept()
                 print(f"연결됨: {client_address}")
-                client_thread = threading.Thread(target=handle_request, args=(client_socket, base_dir))
+                client_thread = threading.Thread(
+                    target=handle_request, args=(client_socket, base_dir)
+                )
                 client_thread.start()
             except socket.timeout:
                 continue
@@ -94,17 +109,19 @@ def run_server(base_dir, port=8080):
         server_socket.close()
         print("서버가 종료되었습니다.")
 
+
 def main():
     if len(sys.argv) != 2:
         print("사용법: python webserver.py <directory_path>")
         sys.exit(1)
-    
+
     base_dir = os.path.abspath(os.path.expanduser(sys.argv[1]))
     if not os.path.isdir(base_dir):
         print(f"오류: {base_dir}는 유효한 디렉토리가 아닙니다.")
         sys.exit(1)
-    
+
     run_server(base_dir)
+
 
 if __name__ == "__main__":
     main()
