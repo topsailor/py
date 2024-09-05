@@ -7,7 +7,6 @@ import threading
 import time
 
 
-# 다시한번 변경 테스트
 def get_content_type(file_path):
     mime_type, _ = mimetypes.guess_type(file_path)
     return mime_type or "application/octet-stream"
