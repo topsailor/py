@@ -10,6 +10,6 @@ soup = BeautifulSoup(data.text, "html.parser")
 blind = soup.select("body .blind")
 
 # 결과를 파일로 저장
-with open("scraping_results.txt", "w", encoding="utf-8") as file:
+with open("scraping_results.txt", "a", encoding="utf-8") as file:
     for b in blind:
         file.write(b.text + "\n")
