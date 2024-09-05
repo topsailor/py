@@ -1,9 +1,9 @@
 import socket
 import threading
-import re
+
 
 class ChatServer:
-    def __init__(self, host='localhost', port=5000):
+    def __init__(self, host="localhost", port=5000):
         self.host = host
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,7 +17,9 @@ class ChatServer:
         while True:
             client_socket, address = self.server_socket.accept()
             print(f"새로운 연결: {address}")
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
+            client_thread = threading.Thread(
+                target=self.handle_client, args=(client_socket,)
+            )
             client_thread.start()
 
     def handle_client(self, client_socket):
@@ -26,16 +28,18 @@ class ChatServer:
 
         while True:
             try:
-                message = client_socket.recv(1024).decode('utf-8')
+                message = client_socket.recv(1024).decode("utf-8")
                 if not message:
                     break
 
-                if message.startswith('/set name '):
+                if message.startswith("/set name "):
                     new_name = message[10:].strip()
                     if new_name:
                         old_name = self.clients[client_socket]
                         self.clients[client_socket] = new_name
-                        self.broadcast(f"{old_name}님이 {new_name}(으)로 이름을 변경했습니다.")
+                        self.broadcast(
+                            f"{old_name}님이 {new_name}(으)로 이름을 변경했습니다."
+                        )
                 else:
                     self.broadcast(f"{self.clients[client_socket]}: {message}")
 
@@ -49,9 +53,10 @@ class ChatServer:
     def broadcast(self, message):
         for client in self.clients:
             try:
-                client.send(message.encode('utf-8'))
+                client.send(message.encode("utf-8"))
             except:
                 pass
+
 
 if __name__ == "__main__":
     server = ChatServer()
