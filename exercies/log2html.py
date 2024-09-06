@@ -3,6 +3,9 @@ import sys
 from datetime import datetime
 from collections import deque
 
+def AMPM_to_korean(time_str):
+    return time_str.replace("AM","오전").replace("PM","오후")
+
 
 def parse_log_file(file_path, num_lines):
     # pattern = r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)"
@@ -19,6 +22,7 @@ def parse_log_file(file_path, num_lines):
                         timestamp_str[:-6], "%Y-%m-%dT%H:%M:%S"
                     )
                     timestamp = timestamp.strftime("%y년 %m월 %d일 %p %I시 %M분 %S초")
+                    timestamp = AMPM_to_korean(timestamp)
                     parsed_logs.append(
                         {
                             "timestamp": timestamp,
