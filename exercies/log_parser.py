@@ -4,7 +4,8 @@ from datetime import datetime
 from collections import deque
 
 def parse_log_file(file_path, num_lines):
-    pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)'
+    # pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)'
+    pattern = r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}) (\w+) (.+)"
     parsed_logs = deque(maxlen=num_lines)
     
     try:
