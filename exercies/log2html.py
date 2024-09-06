@@ -15,7 +15,7 @@ def parse_log_file(file_path, num_lines):
                 if match:
                     timestamp_str, log_level, message = match.groups()
                     timestamp = datetime.strptime(
-                        timestamp_str[:-5], "%Y년 %m월 %d일 %H시 %M분 %S초"
+                        timestamp_str[:-5], "%Y-%m-%dT%H:%M:%S"
                     )
                     parsed_logs.append(
                         {
