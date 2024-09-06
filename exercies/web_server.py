@@ -113,7 +113,7 @@ def main():
     # if len(sys.argv) != 2:
     #     print("사용법: python webserver.py <directory_path>")
     #     sys.exit(1)
-    base_dir = "./html/"
+    base_dir = "/home/opti36/html/"
     # base_dir = os.path.abspath(os.path.expanduser(sys.argv[1]))
     if not os.path.isdir(base_dir):
         print(f"오류: {base_dir}는 유효한 디렉토리가 아닙니다.")
