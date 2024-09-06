@@ -5,12 +5,18 @@ from datetime import datetime
 from collections import deque
 
 def AMPM_to_korean(time_str):
+    """
+        AM, PM 문자열을 한글로 바꿔주는 함수
+    """
     return time_str.replace("AM","오전").replace("PM","오후")
 
 
 def parse_log_file(file_path, num_lines):
     # pattern = r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)"
+
+    # New Regex Parser: UTC 시간 형식이 달라 수정함.
     pattern = r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}) (\w+) (.+)"
+
     parsed_logs = deque(maxlen=num_lines)
 
     try:
@@ -20,9 +26,13 @@ def parse_log_file(file_path, num_lines):
                 if match:
                     timestamp_str, log_level, message = match.groups()
                     timestamp = datetime.strptime(
+                        # UTC 형식 맞춰 -5 에서 -6으로
                         timestamp_str[:-6], "%Y-%m-%dT%H:%M:%S"
                     )
+                    # strftime 통해 포맷 다시 잡음
                     timestamp = timestamp.strftime("%y년 %m월 %d일 %p %I시 %M분 %S초")
+
+                    # AMPM Translation
                     timestamp = AMPM_to_korean(timestamp)
                     parsed_logs.append(
                         {
@@ -91,6 +101,9 @@ def xdg_show(html_path):
     subprocess.run(["xdg-open",html_path])
 
 def main():
+    """
+        기존의 사용자 Input 받던 과정 생략하고 특정 위치로 고정.
+    """
 #    if len(sys.argv) != 4:
 #        print(
 #            "사용법: python log_parser.py <로그_파일_경로> <읽을_라인_수> <출력_HTML_파일_경로>"
@@ -125,6 +138,9 @@ def main():
     except Exception as e:
         print(f"HTML 파일 생성 중 오류 발생: {str(e)}")
         sys.exit(1)
+
+    # Linux 내장 xdg-open 명령 통해 html 파일 CLI에서 확인
+    # cli용 웹브라우저(w3m, links 등)와 xdg-utils 패키지 사전 설치 필요        
     xdg_show(output_html_path)
 
 if __name__ == "__main__":
