@@ -4,7 +4,6 @@ import sys
 from urllib.parse import unquote
 import mimetypes
 import threading
-import time
 
 
 def get_content_type(file_path):
