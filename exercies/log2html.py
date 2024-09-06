@@ -82,22 +82,25 @@ def create_html_content(parsed_logs):
 
 
 def main():
-    if len(sys.argv) != 4:
-        print(
-            "사용법: python log_parser.py <로그_파일_경로> <읽을_라인_수> <출력_HTML_파일_경로>"
-        )
-        sys.exit(1)
-
-    log_file_path = sys.argv[1]
-    output_html_path = sys.argv[3]
-
-    try:
-        num_lines = int(sys.argv[2])
-        if num_lines <= 0:
-            raise ValueError
-    except ValueError:
-        print("오류: 라인 수는 양의 정수여야 합니다.")
-        sys.exit(1)
+#    if len(sys.argv) != 4:
+#        print(
+#            "사용법: python log_parser.py <로그_파일_경로> <읽을_라인_수> <출력_HTML_파일_경로>"
+#        )
+#        sys.exit(1)
+#
+#    log_file_path = sys.argv[1]
+#    output_html_path = sys.argv[3]
+#
+#    try:
+#        num_lines = int(sys.argv[2])
+#        if num_lines <= 0:
+#            raise ValueError
+#    except ValueError:
+#        print("오류: 라인 수는 양의 정수여야 합니다.")
+#        sys.exit(1)
+    log_file_path = "/var/log/alllog.log"
+    num_lines=15
+    output_html_path = "/home/opti36/html/index.html"
 
     parsed_logs = parse_log_file(log_file_path, num_lines)
 
