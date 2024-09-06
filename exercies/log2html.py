@@ -1,5 +1,6 @@
 import re
 import sys
+import subprocess
 from datetime import datetime
 from collections import deque
 
@@ -86,6 +87,8 @@ def create_html_content(parsed_logs):
 
     return html_content
 
+def xdg_show(html_path):
+    subprocess.run(["xdg-open",html_path])
 
 def main():
 #    if len(sys.argv) != 4:
@@ -122,7 +125,7 @@ def main():
     except Exception as e:
         print(f"HTML 파일 생성 중 오류 발생: {str(e)}")
         sys.exit(1)
-
+    xdg_show(output_html_path)
 
 if __name__ == "__main__":
     main()
