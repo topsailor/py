@@ -14,7 +14,7 @@ def excel_to_csv(excel_file):
         csv_file = f"{base_name}.csv"
 
         # CSV 파일로 저장
-        with open(csv_file, "w", newline="", encoding="euc-kr") as f:
+        with open(csv_file, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
 
             # 컬럼 제목 출력
