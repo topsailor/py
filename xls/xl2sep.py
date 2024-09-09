@@ -35,7 +35,7 @@ def excel_to_sep(excel_file, separator="|"):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print("사용법: python xl2txt.py <엑셀_파일_경로> [구분자]")
+        print("사용법: python xl2sep.py <엑셀_파일_경로> [구분자]")
         print("구분자를 지정하지 않으면 기본값 '|'가 사용됩니다.")
     else:
         excel_file = sys.argv[1]

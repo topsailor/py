@@ -21,7 +21,7 @@ driver.get(url)
 email_field = driver.find_element(By.ID, "hero_user_email")
 
 # 이메일 입력 및 엔터 키 입력
-email_field.send_keys("durumee")
+email_field.send_keys("안녕하세요")
 # email_field.send_keys(Keys.RETURN)  # 엔터 키 입력
 
 # 입력된 내용 확인
