@@ -1,0 +1,137 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+import time
+import re
+def extract_content(element, depth=0, is_first_level=True, base_indent=2):
+    result = []
+    if isinstance(element, str):
+        return []
+    if element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+        heading_level = int(element.name[1])
+        heading_text = element.get_text(strip=True)
+        result.append(('#' * heading_level) + ' ' + heading_text)
+    elif element.name == 'div' and element.has_attr('contenteditable') and element['contenteditable'] == 'false':
+        # placeholder = element.get('placeholder', '').lower()
+        # text = element.get_text(strip=True)
+        
+        # if text:
+        #     if is_first_level:
+        #         indent = ' ' * base_indent
+        #     else:
+        #         indent = ' ' * (base_indent + (depth - 1) * 2)
+        #     prefix = '- ' if placeholder == '리스트' else ''
+            
+        #     if result and result[-1].startswith(indent + prefix):
+        #         # 같은 들여쓰기 수준이면 기존 텍스트에 추가
+        #         result[-1] += ' ' + text
+        #     else:
+        #         # 새로운 들여쓰기 수준이면 새 항목 추가
+        #         result.append(indent + prefix + text)
+        
+        # link = element.find('a', class_='notion-link-mention-token')
+        # if link:
+        #     link_text = link.get_text(strip=True)
+        #     link_url = link.get('href', '')
+        #     result.append(indent + f"[{link_text}]({link_url})")
+    
+        placeholder = element.get('placeholder', '').lower()
+        text = element.get_text(strip=True)
+        link = element.find('a', class_='notion-link-mention-token')
+        
+        if is_first_level:
+            indent = ' ' * base_indent
+        else:
+            indent = ' ' * (base_indent + (depth - 1) * 2)
+        prefix = '- ' if placeholder == '리스트' else ''
+        
+        if link:
+            link_text = link.get_text(strip=True)
+            link_url = link.get('href', '')
+            content = f"[{link_text}]({link_url})"
+        else:
+            content = text
+        
+        if result and result[-1].startswith(indent + prefix):
+            # 같은 들여쓰기 수준이면 기존 텍스트에 추가
+            result[-1] += ' ' + content
+        else:
+            # 새로운 들여쓰기 수준이면 새 항목 추가
+            result.append(indent + prefix + content)
+            
+    for child in element.children:
+        if isinstance(child, str):
+            continue
+        if child.name:
+            # 'notion-bulleted_list-block' 클래스를 가진 div를 찾아 depth를 증가시킴
+            if child.name == 'div' and 'notion-bulleted_list-block' in child.get('class', []):
+                child_result = extract_content(child, depth + 1, False, base_indent)
+            else:
+                child_result = extract_content(child, depth, False, base_indent)
+            result.extend(child_result)
+    
+    return result
+
+# ChromeDriver 경로 설정
+service = Service('C:\\cdw\\chromedriver.exe')
+
+# Webdriver 옵션 설정
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')  # 브라우저를 열지 않고 백그라운드에서 실행
+
+# Webdriver 초기화
+driver = webdriver.Chrome(service=service, options=options)
+
+# 웹페이지 접속
+url = "https://durumee.notion.site/fa9a32255e2f4297ab5b5dfd632bb6cb"
+driver.get(url)
+
+# 페이지가 완전히 로드될 때까지 대기
+wait = WebDriverWait(driver, 10)
+wait.until(EC.presence_of_element_located((By.CLASS_NAME, "notion-page-content")))
+
+# 추가적인 대기 시간 (JavaScript가 모든 내용을 렌더링할 시간을 줌)
+time.sleep(5)
+
+# 페이지 소스 가져오기
+page_source = driver.page_source
+
+# BeautifulSoup으로 파싱
+soup = BeautifulSoup(page_source, 'html.parser')
+
+# 메인 컨텐츠 영역 찾기
+main_content = soup.find('main', class_='notion-frame')
+
+# 결과를 저장할 리스트
+extracted_text = []
+
+if main_content:
+    layout_contents = main_content.find_all('div', class_='layout-content')
+    for layout in layout_contents:
+        extracted_text.extend(extract_content(layout))
+# 추출된 텍스트를 하나의 문자열로 연결
+final_text = '\n'.join(extracted_text)
+
+# 연속된 빈 줄 제거
+final_text = re.sub(r'\n{3,}', '\n\n', final_text)
+
+# 결과 출력
+print(final_text)
+
+# 결과를 파일로 저장
+with open('extracted_content.md', 'w', encoding='utf-8') as f:
+    f.write(final_text)
+
+print("추출된 내용이 'extracted_content.md' 파일로 저장되었습니다.")
+
+# Webdriver 종료
+driver.quit()
+
+# # 텍스트 파일로 저장
+# with open('notion_crawling_result.txt', 'w', encoding='utf-8') as f:
+#     f.writelines(content_to_save)
+
+# print("크롤링 결과가 'notion_crawling_result.txt' 파일로 저장되었습니다.")

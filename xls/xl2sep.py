@@ -3,7 +3,7 @@ import sys
 import os
 
 
-def excel_to_sep(excel_file, separator="|"):
+def excel_to_sep(excel_file, separator="|"): # 함수 선언에서 paramName = "value" 하는 것은 생략시 기본값을 지정하는 것.
     try:
         # 엑셀 파일 읽기
         df = pd.read_excel(excel_file)
@@ -11,18 +11,21 @@ def excel_to_sep(excel_file, separator="|"):
         # 출력 파일명 생성
         base_name = os.path.splitext(os.path.basename(excel_file))[0]
         text_file = f"{base_name}.txt"
+        escaped_sep = "\\" + separator
 
         # 파일로 저장
-        with open(text_file, "w", encoding="euc-kr") as f:
+        with open(text_file, "w", encoding="utf-8") as f:
             # 컬럼 제목 출력
             f.write(separator.join(df.columns) + "\n")
 
             # 각 행의 내용 출력
             for index, row in df.iterrows():
                 f.write(
-                    separator.join(
-                        str(value).replace(separator, f"\\{separator}") for value in row
-                    )
+                    # separator.join(
+                    #     str(value).replace(separator, f"\\{separator}") for value in row
+                    # )
+                    
+                    escaped_sep.join(str(value) for value in row) # 이 편이 가독성이나 성능, 유지보수 면에서 낫다.
                     + "\n"
                 )
 
